@@ -1,0 +1,36 @@
+#!/usr/bin/python
+
+import subprocess
+import os
+import qrcode
+from datetime import datetime
+
+def generate_ssh_key():
+    key_name = input("Enter name for private key (without spaces): ").strip()
+    key_path = os.path.expanduser(f"~/.ssh/{key_name}")
+    
+    # Generating SSH keys
+    subprocess.run([
+        "ssh-keygen",
+        "-t", "ed25519",
+        "-f", key_path,
+        "-N", "",  # Blank password
+        "-q"
+    ], check=True)
+    
+    with open(f"{key_path}.pub", "r") as f:
+        pub_key = f.read().strip()
+    
+    qr = qrcode.QRCode()
+    qr.add_data(pub_key)
+    qr.make()
+    
+    print("\nScan QR-code to get your public key:")
+    qr.print_ascii(tty=True)
+    
+    print("\nOr copy it here:")
+    print(pub_key)
+
+if __name__ == "__main__":
+    generate_ssh_key()
+
